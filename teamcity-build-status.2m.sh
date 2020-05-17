@@ -22,14 +22,17 @@
 #     Password: your TeamCity password
 #     - Click `Add`
 #
-# - Fill in below configuration variables
+# - Fill in configuration in .bitbar-teamcity-plugin.json in Bitbar plugins folder
 
-USERNAME="your-teamcity-username"
-SERVER="https://your-teamcity-url"
-PROJECT_ID="id-of-the-teamcity-project-that-you-want-to-monitor"
-KEYCHAIN_ACCOUNT_ID="your-keychain-account-id"
+export PATH=/usr/local/bin:${PATH}
 
-# END CONFIGURATION
+SCRIPT_DIR=$(cd $(dirname $0); pwd)
+
+CONFIG=$(cat ${SCRIPT_DIR}/.bitbar-teamcity-plugin.json)
+USERNAME=$(echo ${CONFIG} | jq -r '.username')
+SERVER=$(echo ${CONFIG} | jq -r '.server')
+PROJECT_ID=$(echo ${CONFIG} | jq -r '.projectId')
+KEYCHAIN_ACCOUNT_ID=$(echo ${CONFIG} | jq -r '.keychainAccountId')
 
 KEYCHAIN_RECORD=$(security 2>&1 >/dev/null find-generic-password -ga ${KEYCHAIN_ACCOUNT_ID})
 PASSWORD=$(echo ${KEYCHAIN_RECORD} | sed 's/password:[[:space:]]"\(.*\)"/\1/')
@@ -39,8 +42,6 @@ BUILDS=$(curl -H 'Accept: application/json' \
               -s \
               ${SERVER}/app/rest/buildTypes?locator=affectedProject:\(id:${PROJECT_ID}\)\&fields=buildType\(id,name,project,builds\(\$locator\(running:any,canceled:false,count:1\),build\(number,status,statusText,webUrl\)\)\)
         )
-
-export PATH=/usr/local/bin:${PATH}
 
 LINKS=$(echo ${BUILDS} | \
     jq -r '.buildType[] | select(.builds.build[0].status == "FAILURE") | (.project.name) + " - " + (.name) + " #" + (.builds.build[0].number) + "| color=red href=" + (.builds.build[0].webUrl) + "\n--" + .builds.build[0].statusText +" | color=red href=" + (.builds.build[0].webUrl)')

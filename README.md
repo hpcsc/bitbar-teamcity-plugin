@@ -18,14 +18,20 @@ A plugin for [BitBar](https://github.com/matryer/bitbar) to display build status
     ```
     - Click `Add`
 
-- Update the configuration for this plugin in the shell script file:
+- Clone this repository and symlink the script in this repo to your BitBar plugins folder:
 
-```
-USERNAME="your-teamcity-username"
-SERVER="https://your-teamcity-url"
-PROJECT_ID="id-of-the-teamcity-project-that-you-want-to-monitor"    # this id is displayed in the url when you navigate to your TeamCity project using browser
-KEYCHAIN_ACCOUNT_ID=teamcity-admin  # this matches the account name in previous step
-```
+    ```
+    ln -s $PWD/teamcity-build-status.2m.sh path-to-your-bitbar-plugin-folder/teamcity-build-status.2m.sh
+    ```
 
-- Drop the script into your BitBar plugin folder
-- When the plugin runs for the 1st time, it will ask for permission to access your Keychain to get TeamCity password.
+- Copy `sample.config.json` to your BitBar plugins folder and rename it:
+
+    ```
+    cp ./sample-config.json path-to-your-bitbar-plugin-folder/.bitbar-teamcity-plugin.json
+    ```
+
+    Notice the dot in front of json file name? This is to prevent BitBar from executing this file
+
+- Update configuration in your `bitbar-teamcity-plugin.json`
+
+Note: When the plugin runs for the 1st time, it will ask for permission to access your Keychain to get TeamCity password.
