@@ -24,7 +24,13 @@
 #
 # - Fill in configuration in .bitbar-teamcity-plugin.json in Bitbar plugins folder
 
-export PATH=/usr/bin:/usr/local/bin:${PATH}
+export PATH=/usr/local/bin:${PATH}
+
+if [[ ! -x "$(command -v jq)" ]] || [[ ! -x "$(command -v curl)" ]]; then
+    echo "=== jq and curl are required for this plugin"
+    echo "They are either not installed or not available at PATH=${PATH}"
+    exit 1
+fi;
 
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
 
@@ -40,6 +46,8 @@ PROJECT_URL="Open TeamCity | href=${SERVER}/project/${PROJECT_ID}"
 
 if ([[ -n "${UNTIL}" ]] && [[ "$(date '+%H:%M')" > "${UNTIL}" ]]) ||
    ([[ -n "${FROM}" ]] && [[ "$(date '+%H:%M')" < "${FROM}" ]]); then
+    echo "INACTIVE | color=gray"
+    echo "---"
     echo "${PROJECT_URL}"
     exit 0
 fi;
