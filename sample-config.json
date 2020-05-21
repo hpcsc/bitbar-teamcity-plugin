@@ -2,5 +2,7 @@
     "username": "your-teamcity-username",
     "server": "https://your-teamcity-url",
     "projectId": "id-of-the-teamcity-project-that-you-want-to-monitor",
-    "keychainAccountId": "your-keychain-account-id"
+    "keychainAccountId": "your-keychain-account-id",
+    "from": "09:00",
+    "until": "17:00"
 }

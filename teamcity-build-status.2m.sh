@@ -24,7 +24,7 @@
 #
 # - Fill in configuration in .bitbar-teamcity-plugin.json in Bitbar plugins folder
 
-export PATH=/usr/local/bin:${PATH}
+export PATH=/usr/bin:/usr/local/bin:${PATH}
 
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
 
@@ -33,6 +33,16 @@ USERNAME=$(echo ${CONFIG} | jq -r '.username')
 SERVER=$(echo ${CONFIG} | jq -r '.server')
 PROJECT_ID=$(echo ${CONFIG} | jq -r '.projectId')
 KEYCHAIN_ACCOUNT_ID=$(echo ${CONFIG} | jq -r '.keychainAccountId')
+FROM=$(echo ${CONFIG} | jq -r '.from | select (. != null)')
+UNTIL=$(echo ${CONFIG} | jq -r '.until | select (. != null)')
+
+PROJECT_URL="Open TeamCity | href=${SERVER}/project/${PROJECT_ID}"
+
+if ([[ -n "${UNTIL}" ]] && [[ "$(date '+%H:%M')" > "${UNTIL}" ]]) ||
+   ([[ -n "${FROM}" ]] && [[ "$(date '+%H:%M')" < "${FROM}" ]]); then
+    echo "${PROJECT_URL}"
+    exit 0
+fi;
 
 KEYCHAIN_RECORD=$(security 2>&1 >/dev/null find-generic-password -ga ${KEYCHAIN_ACCOUNT_ID})
 PASSWORD=$(echo ${KEYCHAIN_RECORD} | sed 's/password:[[:space:]]"\(.*\)"/\1/')
@@ -59,4 +69,4 @@ else
 fi
 
 echo "---"
-echo "Open TeamCity | href=${SERVER}/project/${PROJECT_ID}"
+echo "${PROJECT_URL}"
