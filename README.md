@@ -21,7 +21,7 @@ A plugin for [BitBar](https://github.com/matryer/bitbar) to display build status
 - Clone this repository and symlink the script in this repo to your BitBar plugins folder:
 
     ```
-    ln -s $PWD/teamcity-build-status.2m.sh path-to-your-bitbar-plugin-folder/teamcity-build-status.2m.sh
+    ln -s $PWD/src/teamcity-build-status.2m.sh path-to-your-bitbar-plugin-folder/teamcity-build-status.2m.sh
     ```
 
 - Copy `sample.config.json` to your BitBar plugins folder and rename it to `.bitbar-teamcity-plugin.json`:
@@ -39,3 +39,15 @@ A plugin for [BitBar](https://github.com/matryer/bitbar) to display build status
         The plugin will not make the call to TeamCity server if the current time is not within `from` and `until` timespan. Both `from` and `until` are optional. When they are present, they must follow the format of `HH:mm` where `HH` is in 24h format (if the hour component is less than 10, prefix it with 0 like `06`). The plugin only uses string comparison to compare the time for simplicity and therefore will not be able to handle complicated/invalid time pattern.
 
 Note: When the plugin runs for the 1st time, it will ask for permission to access your Keychain to get TeamCity password.
+
+
+## Run Tests
+
+This project uses [bats](https://github.com/bats-core/bats-core) and several of its additional libraries like [bats-assert](https://github.com/bats-core/bats-assert) and [bats-support](https://github.com/bats-core/bats-support) for testing
+
+To run the test locally:
+
+```
+git submodule update --init --remote    # pull bats dependency libraries
+./batect test                           # run tests using batect. Tests are run in bats container
+```

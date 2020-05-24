@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # <bitbar.title>TeamCity Build Status</bitbar.title>
 # <bitbar.version>v1.0</bitbar.version>

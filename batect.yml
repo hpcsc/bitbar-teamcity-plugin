@@ -1,0 +1,20 @@
+project_name: bitbar-teamcity-plugin
+
+containers:
+  bats:
+    build_directory: .
+    volumes:
+      - local: ./src
+        container: /code/src
+        options: cached
+      - local: ./tests
+        container: /code/tests
+        options: cached
+    working_directory: /code
+
+tasks:
+  test:
+    description: run tests
+    run:
+      container: bats
+      command: /code/tests/teamcity-build-status-tests.sh
