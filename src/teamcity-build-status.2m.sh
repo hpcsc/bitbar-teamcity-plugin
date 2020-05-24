@@ -24,31 +24,45 @@
 #
 # - Fill in configuration in .bitbar-teamcity-plugin.json in Bitbar plugins folder
 
+set -e
+
 export PATH=/usr/local/bin:${PATH}
 
-if [[ ! -x "$(command -v jq)" ]] || [[ ! -x "$(command -v curl)" ]]; then
+if ([[ "$(type -t jq)" != "function" ]] && [[ ! -x "$(command -v jq)" ]]) ||
+    ([[ "$(type -t curl)" != "function" ]] && [[ ! -x "$(command -v curl)" ]]); then
     echo "=== jq and curl are required for this plugin"
     echo "They are either not installed or not available at PATH=${PATH}"
     exit 1
 fi;
 
 SCRIPT_DIR=$(cd $(dirname $0); pwd)
+CONFIG_FILE=${1:-${SCRIPT_DIR}/.bitbar-teamcity-plugin.json}
 
-CONFIG=$(cat ${SCRIPT_DIR}/.bitbar-teamcity-plugin.json)
+CONFIG=$(cat ${CONFIG_FILE})
 USERNAME=$(echo ${CONFIG} | jq -r '.username')
 SERVER=$(echo ${CONFIG} | jq -r '.server')
 PROJECT_ID=$(echo ${CONFIG} | jq -r '.projectId')
 KEYCHAIN_ACCOUNT_ID=$(echo ${CONFIG} | jq -r '.keychainAccountId')
 FROM=$(echo ${CONFIG} | jq -r '.from | select (. != null)')
 UNTIL=$(echo ${CONFIG} | jq -r '.until | select (. != null)')
+DAYS_OF_WEEK=$(echo ${CONFIG} | jq -r '.daysOfWeek | select (. != null)')
 
 PROJECT_URL="Open TeamCity | href=${SERVER}/project/${PROJECT_ID}"
 
-if ([[ -n "${UNTIL}" ]] && [[ "$(date '+%H:%M')" > "${UNTIL}" ]]) ||
-   ([[ -n "${FROM}" ]] && [[ "$(date '+%H:%M')" < "${FROM}" ]]); then
+print_inactive_output() {
     echo "INACTIVE | color=gray"
     echo "---"
     echo "${PROJECT_URL}"
+}
+
+if ([[ -n "${UNTIL}" ]] && [[ "$(date '+%H:%M')" > "${UNTIL}" ]]) ||
+   ([[ -n "${FROM}" ]] && [[ "$(date '+%H:%M')" < "${FROM}" ]]); then
+    print_inactive_output
+    exit 0
+fi;
+
+if [[ -n "${DAYS_OF_WEEK}" ]] && [[ "${DAYS_OF_WEEK}," != *"$(date '+%u'),"* ]]; then
+    print_inactive_output
     exit 0
 fi;
 

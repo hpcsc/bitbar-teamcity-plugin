@@ -4,5 +4,6 @@
     "projectId": "id-of-the-teamcity-project-that-you-want-to-monitor",
     "keychainAccountId": "your-keychain-account-id",
     "from": "09:00",
-    "until": "17:00"
+    "until": "17:00",
+    "daysOfWeek": "1,2,3,4,5"
 }

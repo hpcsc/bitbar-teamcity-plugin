@@ -38,6 +38,10 @@ A plugin for [BitBar](https://github.com/matryer/bitbar) to display build status
 
         The plugin will not make the call to TeamCity server if the current time is not within `from` and `until` timespan. Both `from` and `until` are optional. When they are present, they must follow the format of `HH:mm` where `HH` is in 24h format (if the hour component is less than 10, prefix it with 0 like `06`). The plugin only uses string comparison to compare the time for simplicity and therefore will not be able to handle complicated/invalid time pattern.
 
+    - `daysOfWeek` field:
+
+        Comma-separated string of days of week that the plugin is supposed to run. Valid values are 1-7 (1 is Monday, 7 is Sunday)
+
 Note: When the plugin runs for the 1st time, it will ask for permission to access your Keychain to get TeamCity password.
 
 
