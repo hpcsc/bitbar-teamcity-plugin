@@ -24,8 +24,6 @@
 #
 # - Fill in configuration in .bitbar-teamcity-plugin.json in Bitbar plugins folder
 
-set -e
-
 export PATH=/usr/local/bin:${PATH}
 
 if ([[ "$(type -t jq)" != "function" ]] && [[ ! -x "$(command -v jq)" ]]) ||
@@ -72,8 +70,16 @@ PASSWORD=$(echo ${KEYCHAIN_RECORD} | sed 's/password:[[:space:]]"\(.*\)"/\1/')
 BUILDS=$(curl -H 'Accept: application/json' \
               -u "${USERNAME}:${PASSWORD}" \
               -s \
+              --max-time 3 \
               ${SERVER}/app/rest/buildTypes?locator=affectedProject:\(id:${PROJECT_ID}\)\&fields=buildType\(id,name,project,builds\(\$locator\(running:any,canceled:false,count:1\),build\(number,status,statusText,webUrl\)\)\)
         )
+
+if [[ $? -ne 0 ]]; then
+    echo "UNREACHABLE | color=red"
+    echo "---"
+    echo "${PROJECT_URL}"
+    exit 0
+fi;
 
 LINKS=$(echo ${BUILDS} | \
     jq -r '.buildType[] | select(.builds.build[0].status == "FAILURE") | (.project.name) + " - " + (.name) + " #" + (.builds.build[0].number) + "| color=red href=" + (.builds.build[0].webUrl) + "\n--" + .builds.build[0].statusText +" | color=red href=" + (.builds.build[0].webUrl)')

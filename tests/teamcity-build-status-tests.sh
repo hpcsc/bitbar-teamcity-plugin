@@ -158,3 +158,24 @@ EOF
   assert_success
   assert_output --partial 'http://localhost:8111/viewLog.html?buildId=260&buildTypeId=failure-project-1'
 }
+
+@test "return UNREACHABLE if not able to reach TeamCity after timeout period" {
+  security() { echo "password: blah"; }
+  export -f security
+
+CONFIG=$(cat <<'EOF'
+{
+    "username": "admin",
+    "server": "http://not-existing-server:8111",
+    "projectId": "SomeProjectId",
+    "keychainAccountId": "local-teamcity"
+}
+EOF
+)
+
+  BASE_DIR=$(dirname ${BATS_TEST_DIRNAME})
+  run ${BASE_DIR}/src/teamcity-build-status.2m.sh <(echo ${CONFIG})
+
+  assert_success
+  assert_output --partial 'UNREACHABLE'
+}
