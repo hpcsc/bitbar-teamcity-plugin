@@ -179,3 +179,29 @@ EOF
   assert_success
   assert_output --partial 'UNREACHABLE'
 }
+
+@test "return error response if server returns non-json response" {
+  security() { echo "password: blah"; }
+  export -f security
+  curl() {
+    echo "some non-json response"
+  }
+  export -f curl
+
+CONFIG=$(cat <<'EOF'
+{
+    "username": "admin",
+    "server": "http://localhost:8111",
+    "projectId": "SomeProjectId",
+    "keychainAccountId": "local-teamcity"
+}
+EOF
+)
+
+  BASE_DIR=$(dirname ${BATS_TEST_DIRNAME})
+  run ${BASE_DIR}/src/teamcity-build-status.2m.sh <(echo ${CONFIG})
+
+  assert_success
+  assert_output --partial 'ERROR'
+  assert_output --partial 'some non-json response'
+}

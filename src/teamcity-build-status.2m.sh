@@ -81,6 +81,14 @@ if [[ $? -ne 0 ]]; then
     exit 0
 fi;
 
+if [ "$(echo "${BUILDS}" | jq empty > /dev/null 2>&1; echo $?)" -ne 0 ]; then
+    echo "ERROR | color=red"
+    echo "---"
+    echo "${BUILDS} | color=red"
+    echo "${PROJECT_URL}"
+    exit 0
+fi
+
 LINKS=$(echo ${BUILDS} | \
     jq -r '.buildType[] | select(.builds.build[0].status == "FAILURE") | (.project.name) + " - " + (.name) + " #" + (.builds.build[0].number) + "| color=red href=" + (.builds.build[0].webUrl) + "\n--" + .builds.build[0].statusText +" | color=red href=" + (.builds.build[0].webUrl)')
 IFS=$'\n'
